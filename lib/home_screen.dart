@@ -1,24 +1,29 @@
 import 'product.dart';
+import 'product_store.dart';
+
 import 'package:flutter/material.dart';
+
 import 'add_product_screen.dart';
-import 'product_details_creen.dart';
+import 'product_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  final List<Product> products;
-  const HomeScreen({super.key, required this.products});
+  final ProductStore store;
+  const HomeScreen({super.key, required this.store});
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late List<Product> products ;
+  late List<Product> products;
+  String _search = '';
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    products = widget.products;
+    products = widget.store.products;
   }
-  void confirmDelete(int index) {
+
+  void confirmDelete(Product product) {
     showDialog(
       context: context,
       builder: (context) {
@@ -35,41 +40,63 @@ class _HomeScreenState extends State<HomeScreen> {
             TextButton(
               onPressed: () {
                 setState(() {
-                  products.removeAt(index);
+                  products.remove(product);
                 });
+                widget.store.save();
                 Navigator.pop(context);
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Product deleted')),
                 );
               },
-              child: const Text('Delete',style: TextStyle(color:Colors.red),),
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
             ),
           ],
         );
       },
     );
   }
-Color _getStatusColor(String status){
-  switch(status){
-    case 'Available':
-      return Colors.green;
-    case 'Low Stock':
-      return Colors.orange;
-    default:
-      return Colors.red;
-  }
-}
+
   @override
   Widget build(BuildContext context) {
+    // Products matching the search box (name or code)
+    final visible = products
+        .where((p) =>
+            p.productName.toLowerCase().contains(_search) ||
+            p.productCode.toLowerCase().contains(_search))
+        .toList();
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Products')),
-      body: products.isEmpty
-          ? const Center(child: Text('No products available'))
+      appBar: AppBar(
+        title: const Text('Products'),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(64),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 8),
+            child: TextField(
+              decoration: const InputDecoration(
+                hintText: 'Search by name or code',
+                prefixIcon: Icon(Icons.search),
+                filled: true,
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) {
+                setState(() => _search = value.trim().toLowerCase());
+              },
+            ),
+          ),
+        ),
+      ),
+      body: visible.isEmpty
+          ? Center(
+              child: Text(products.isEmpty
+                  ? 'No products available'
+                  : 'No products match your search'),
+            )
           : ListView.builder(
-              itemCount: products.length,
+              itemCount: visible.length,
               itemBuilder: (context, index) {
-                final product = products[index];
+                final product = visible[index];
                 return Card(
                   margin: const EdgeInsets.symmetric(
                     horizontal: 10.0,
@@ -77,9 +104,10 @@ Color _getStatusColor(String status){
                   ),
                   child: ListTile(
                     //product image
+                    isThreeLine: true,
                     leading: CircleAvatar(
                       radius: 28,
-                      backgroundColor:Colors.green.shade200,
+                      backgroundColor: Colors.green.shade200,
                       backgroundImage: AssetImage(product.image),
                     ),
 
@@ -90,7 +118,7 @@ Color _getStatusColor(String status){
                     ),
                     //product code and price
                     subtitle: Text(
-                      'Code: ${product.productCode}\n Price: R${product.price.toStringAsFixed(2)}',
+                      'Code: ${product.productCode}\nPrice: R${product.price.toStringAsFixed(2)}',
                     ),
 
                     //stock status
@@ -98,7 +126,7 @@ Color _getStatusColor(String status){
                       product.status,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: _getStatusColor(product.status),
+                        color: product.statusColor,
                       ),
                     ),
 
@@ -111,32 +139,56 @@ Color _getStatusColor(String status){
                               ProductDetailsScreen(product: product),
                         ),
                       );
-                      if(result == 'delete'){
-                        setState((){
-                          products.removeAt(index);
+                      if (result == 'delete') {
+                        setState(() {
+                          products.remove(product);
                         });
+                        widget.store.save();
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Product deleted')),
+                        );
+                      } else if (result is Product) {
+                        setState(() {
+                          final i = products.indexOf(product);
+                          products[i] = result;
+                        });
+                        widget.store.save();
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Product updated')),
+                        );
                       }
                     },
 
                     //Long press to delete
                     onLongPress: () {
-                      confirmDelete(index);
+                      confirmDelete(product);
                     },
                   ),
                 );
               },
             ),
 
-            //add product button
+      //add product button
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final newProduct = await Navigator.push<Product>(
             context,
             MaterialPageRoute(
-              builder: (context) => const AddProductScreen(),
+              builder: (context) => AddProductScreen(
+                existingCodes: products.map((p) => p.productCode).toList(),
+              ),
             ),
           );
-          // Navigate to add product screen
+          if (newProduct == null) return; // user pressed Cancel
+          setState(() {
+            products.add(newProduct);
+          });
+          widget.store.save();
+          if (!context.mounted) return;
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text('Product added')));
         },
         child: const Icon(Icons.add),
       ),

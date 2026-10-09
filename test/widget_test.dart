@@ -1,30 +1,33 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// Basic tests for the SmartMart Retail Inventory app
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:retail_inventory_management_app/main.dart';
+import 'package:retail_inventory_management_app/product_store.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const SmartMartApp());
+  testWidgets('Home screen shows the sample products', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(SmartMartApp(store: ProductStore()..loadSampleData()));
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // App bar title is shown
+    expect(find.text('Products'), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Sample products are listed
+    expect(find.text('Coca-Cola 2L'), findsOneWidget);
+    expect(find.text('White Bread'), findsOneWidget);
+  });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  testWidgets('Tapping a product opens the detail screen', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(SmartMartApp(store: ProductStore()..loadSampleData()));
+
+    await tester.tap(find.text('Coca-Cola 2L'));
+    await tester.pumpAndSettle(); // wait for the page transition
+
+    expect(find.text('Product Details'), findsOneWidget);
+    expect(find.text('PRD001'), findsOneWidget);
   });
 }

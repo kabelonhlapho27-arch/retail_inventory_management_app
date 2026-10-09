@@ -1,4 +1,3 @@
-
 //Product model
 
 import 'package:flutter/material.dart';
@@ -31,9 +30,9 @@ class Product {
     required this.price,
     required this.quantity,
     required this.status,
-    this.image= 'assets/images/placeholder.png',
+    this.image = 'assets/images/placeholder.png',
   });
-   //images can load from the assets/images
+  //images can load from the assets/images
   static String imageForCategory(String category) =>
       'assets/images/${category.toLowerCase().replaceAll(' ', '_')}.png';
   String toLine() =>
@@ -58,7 +57,8 @@ class Product {
     );
   }
 
-  Color statusColor(String status) {
+  // Colour used to display the stock status
+  Color get statusColor {
     switch (status) {
       case 'Available':
         return Colors.green;
@@ -69,4 +69,3 @@ class Product {
     }
   }
 }
-
