@@ -16,7 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState(){
     super.initState();
-    products = wodget.products;
+    products = widget.products;
   }
   void confirmDelete(int index) {
     showDialog(
