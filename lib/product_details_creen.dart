@@ -1,4 +1,4 @@
-import 'product.dart'
+import 'product.dart';
 import 'package:flutter/material.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
@@ -82,9 +82,9 @@ void _confirmDelete(BuildContext context){
                     Text('R${product.price.toStringAsFixed(2)}'),
                   ],
                 ),
-                const Sizedbox(height: 8,),
+                const SizedBox(height: 8,),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spacBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children:[
                     const Text('Quantity:'),
                     Text('${product.quantity}'),
@@ -92,7 +92,7 @@ void _confirmDelete(BuildContext context){
                 ),
                 const SizedBox(height: 8,),
                 Row(
-                  mainAxisAlignment:MainaxisAlignment.spaceBetween,
+                  mainAxisAlignment:MainAxisAlignment.spaceBetween,
                   children:[
                     const Text('Status:'),
                     Text(
@@ -110,7 +110,7 @@ void _confirmDelete(BuildContext context){
          ),
          const SizedBox(height : 20,),
          Row(
-           mainAxisAlignment : mainAxisAlignment.spaceEvenly,
+           mainAxisAlignment : MainAxisAlignment.spaceEvenly,
            children:[
              ElevatedButton(onPressed: (){
                //Navigate to edit Screen 
@@ -120,7 +120,7 @@ void _confirmDelete(BuildContext context){
              ElevatedButton(
                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                onPressed:(){
-                 _confirmdelete(context);
+                 _confirmDelete(context);
                },child:const Text('Delete',style: TextStyle(color:Colors.white),))
            ],
          )
