@@ -70,3 +70,7 @@ class Product {
   }
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> dfcdf8f14a08f689eb0daf3820d2892717f49a14

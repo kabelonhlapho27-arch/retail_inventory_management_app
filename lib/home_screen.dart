@@ -1,17 +1,23 @@
+import 'product.dart';
 import 'package:flutter/material.dart';
-
 import 'add_product_screen.dart';
 import 'product_details_creen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required List<dynamic> products});
+  final List<Product> products;
+  const HomeScreen({super.key, required this.products});
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Map<String, dynamic>> products = [];
+  late List<Product> products ;
 
+  @override
+  void initState(){
+    super.initState();
+    products = widget.products;
+  }
   void confirmDelete(int index) {
     showDialog(
       context: context,
@@ -37,14 +43,23 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SnackBar(content: Text('Product deleted')),
                 );
               },
-              child: const Text('Delete'),
+              child: const Text('Delete',style: TextStyle(color:Colors.red),),
             ),
           ],
         );
       },
     );
   }
-
+Color _getStatusColor(String status){
+  switch(status){
+    case 'Available':
+      return Colors.green;
+    case 'Low Stock':
+      return Colors.orange;
+    default:
+      return Colors.red;
+  }
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,38 +79,43 @@ class _HomeScreenState extends State<HomeScreen> {
                     //product image
                     leading: CircleAvatar(
                       radius: 28,
-                      backgroundImage: AssetImage(product['image']),
+                      backgroundColor:Colors.green.shade200,
+                      backgroundImage: AssetImage(product.image),
                     ),
 
                     //product name
                     title: Text(
-                      product['name'],
+                      product.productName,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     //product code and price
                     subtitle: Text(
-                      'Code: ${product['code']}\n'
-                      'Price: \$${product['price'].toStringAsFixed(2)}',
+                      'Code: ${product.productCode}\n Price: R${product.price.toStringAsFixed(2)}',
                     ),
 
                     //stock status
                     trailing: Text(
-                      product['stock'] > 0 ? 'In Stock' : 'Out of Stock',
+                      product.status,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: product['stock'] > 0 ? Colors.green : Colors.red,
+                        color: _getStatusColor(product.status),
                       ),
                     ),
 
                     //Tap to view details
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
                               ProductDetailsScreen(product: product),
                         ),
                       );
+                      if(result == 'delete'){
+                        setState((){
+                          products.removeAt(index);
+                        });
+                      }
                     },
 
                     //Long press to delete

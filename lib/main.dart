@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:retail_inventory_management_app/product_store.dart';
 import 'home_screen.dart';
 
 void main() {
@@ -10,6 +11,8 @@ class SmartMartApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+final store=ProductStore();
+    
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'SmartMart',
@@ -17,7 +20,7 @@ class SmartMartApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         ),
-        home: HomeScreen(products: []),
+        home: HomeScreen(products: store.products),
     );
   }
 }
