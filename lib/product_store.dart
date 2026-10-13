@@ -12,9 +12,10 @@
 //   224136508 - Owami Maphalala
 //   224042164 - Philasande Simelane
 
-import 'dart:io';
-
+import 'dart:io' show File;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'product.dart';
 
@@ -30,34 +31,71 @@ class ProductStore {
     'PRD005,USB Keyboard,Electronics,199.99,8,Available',
   ];
 
-  // products.txt inside the app's documents folder
-  Future<File> _getFile() async {
-    final dir = await getApplicationDocumentsDirectory();
-    return File('${dir.path}/products.txt');
-  }
-
-  // Read products.txt on startup (create it with sample data if missing)
+  // Read data on startup (creates it with sample data if missing)
   Future<void> load() async {
-    final file = await _getFile();
     products.clear();
-    if (!await file.exists()) {
-      loadSampleData();
-      await save();
-      return;
+    List<String> lines = [];
+
+    if (kIsWeb) {
+      //  CHROME STORAGE RUNTIME
+      final prefs = await SharedPreferences.getInstance();
+      lines = prefs.getStringList('products_data') ?? [];
+      
+      // If web storage is completely empty, populate it with sample data first
+      if (lines.isEmpty) {
+        lines = List.from(_sample);
+        await prefs.setStringList('products_data', lines);
+      }
+    } else {
+      // ANDROID EMULATOR &  WINDOWS DESKTOP
+      try {
+        final dir = await getApplicationDocumentsDirectory();
+        final file = File('${dir.path}/products.txt');
+
+        if (await file.exists()) {
+          lines = await file.readAsLines();
+        } else {
+          // If the text file is missing, write sample data to it
+          await file.writeAsString(_sample.join('\n'));
+          lines = List.from(_sample);
+        }
+      } catch (e) {
+        print("Error reading products.txt file: $e");
+      }
     }
-    for (final line in await file.readAsLines()) {
+
+    // Safely parse lines into Product objects for all platforms
+    for (final line in lines) {
+      if (line.trim().isEmpty) continue;
       final product = Product.fromLine(line);
       if (product != null) products.add(product);
     }
   }
 
-  // Rewrite products.txt after every add, edit or delete
+  // Save data back to the persistent layer
   Future<void> save() async {
-    final file = await _getFile();
-    await file.writeAsString(products.map((p) => p.toLine()).join('\n'));
+    // Convert current product list back to the custom line-by-line format
+    final List<String> linesToSave = products.map((p) => p.toLine()).toList();
+
+    if (kIsWeb) {
+      //  CHROME STORAGE RUNTIME
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('products_data', linesToSave);
+      print("Saved data successfully to Chrome LocalStorage.");
+    } else {
+      //  ANDROID EMULATOR & WINDOWS
+      try {
+        final dir = await getApplicationDocumentsDirectory();
+        final file = File('${dir.path}/products.txt');
+        await file.writeAsString(linesToSave.join('\n'));
+        print("Saved data successfully to products.txt.");
+      } catch (e) {
+        print("Error writing to products.txt file: $e");
+      }
+    }
   }
 
-  // Replace the list with the sample products
+  // Replace the list with the sample products manually if needed
   void loadSampleData() {
     products.clear();
     for (final line in _sample) {
