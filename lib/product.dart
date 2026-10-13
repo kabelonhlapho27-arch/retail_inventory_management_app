@@ -1,7 +1,20 @@
-//Product model
+// TPG226C Group Project - SmartMart Retail Inventory Management App
+// File: product.dart - Product model class, categories, statuses and
+//       conversion to/from a products.txt line
+//
+// Group members:
+//   220048471 - Kyle van Aswegen
+//   224037409 - Mlungiso Njoko
+//   224002222 - Kabelo Nhlapo
+//   219005935 - Rainier Bezuidenhout
+//   224069913 - Mobakeng Mochwaro
+//   223068452 - Nathaniël Stanley
+//   224136508 - Owami Maphalala
+//   224042164 - Philasande Simelane
 
 import 'package:flutter/material.dart';
 
+// Options shown in the category and status dropdowns
 const List<String> kCategories = [
   'Beverages',
   'Groceries',
@@ -33,8 +46,11 @@ class Product {
     this.image = 'assets/images/placeholder.png',
   });
   //images can load from the assets/images
+  //e.g. 'Personal Care' -> assets/images/personal_care.png
   static String imageForCategory(String category) =>
       'assets/images/${category.toLowerCase().replaceAll(' ', '_')}.png';
+
+  // Converts the product to one comma-separated line of products.txt
   String toLine() =>
       '$productCode,$productName,$category,${price.toStringAsFixed(2)},$quantity,$status';
 
