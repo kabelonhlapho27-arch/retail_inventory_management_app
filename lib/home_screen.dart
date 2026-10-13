@@ -29,7 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Delete Product'),
-          content: const Text('Are you sure you want to delete this product?'),
+          content: Text(
+            'Are you sure you want to delete ${product.productName}?',
+          ),
           actions: [
             TextButton(
               onPressed: () {
@@ -108,7 +110,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     leading: CircleAvatar(
                       radius: 28,
                       backgroundColor: Colors.green.shade200,
-                      backgroundImage: AssetImage(product.image),
+                      child: ClipOval(
+                        child: Image.asset(
+                          product.image,
+                          width: 56,
+                          height: 56,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.inventory_2, color: Colors.white),
+                        ),
+                      ),
                     ),
 
                     //product name
