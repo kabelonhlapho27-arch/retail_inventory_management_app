@@ -1,5 +1,21 @@
+// TPG226C Group Project - SmartMart Retail Inventory Management App
+// File: product_details_screen.dart - Product Detail screen: shows all
+//       product details with Edit and Delete buttons
+//
+// Group members:
+//   220048471 - Kyle van Aswegen
+//   224037409 - Mlungiso Njoko
+//   224002222 - Kabelo Nhlapo
+//   219005935 - Rainier Bezuidenhout
+//   224069913 - Mobakeng Mochwaro
+//   223068452 - Nathaniël Stanley
+//   224136508 - Owami Maphalala
+//   224042164 - Philasande Simelane
+
 import 'product.dart';
+
 import 'package:flutter/material.dart';
+
 import 'add_product_screen.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
@@ -7,6 +23,7 @@ class ProductDetailsScreen extends StatelessWidget {
 
   const ProductDetailsScreen({super.key, required this.product});
 
+  // Asks the user to confirm, then tells the home screen to delete the product
   void _confirmDelete(BuildContext context) {
     showDialog(
       context: context,
@@ -22,8 +39,8 @@ class ProductDetailsScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context, 'delete');
+              Navigator.pop(context); // close the dialog
+              Navigator.pop(context, 'delete'); // close this screen
             },
             child: Text('Delete', style: TextStyle(color: Colors.red)),
           ),
@@ -45,6 +62,7 @@ class ProductDetailsScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
+                    // Product image (icon if the image is missing)
                     Image.asset(
                       product.image,
                       height: 150,
@@ -52,6 +70,7 @@ class ProductDetailsScreen extends StatelessWidget {
                           const Icon(Icons.image, size: 100),
                     ),
                     const SizedBox(height: 16),
+                    // Product name
                     Text(
                       product.productName,
                       style: const TextStyle(
@@ -60,6 +79,7 @@ class ProductDetailsScreen extends StatelessWidget {
                       ),
                     ),
                     const Divider(),
+                    // One row per detail: label on the left, value on the right
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -110,15 +130,18 @@ class ProductDetailsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
+            // Edit and Delete buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
                   onPressed: () async {
+                    // Open the form in edit mode with this product loaded
                     final updated = await Navigator.push<Product>(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => AddProductScreen(product: product),
+                        builder: (context) =>
+                            AddProductScreen(product: product),
                       ),
                     );
                     if (updated == null) return; // user pressed Cancel

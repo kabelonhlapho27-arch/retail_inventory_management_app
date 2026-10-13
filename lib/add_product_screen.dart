@@ -1,6 +1,16 @@
-// Add / Edit Product screen
-// Used for both adding a new product and editing an existing one.
-// If a product is passed in, the form opens in "edit" mode with its values loaded.
+// TPG226C Group Project - SmartMart Retail Inventory Management App
+// File: add_product_screen.dart - Add/Edit Product form with validation.
+//       Opens empty to add a product, or pre-filled to edit one.
+//
+// Group members:
+//   220048471 - Kyle van Aswegen
+//   224037409 - Mlungiso Njoko
+//   224002222 - Kabelo Nhlapo
+//   219005935 - Rainier Bezuidenhout
+//   224069913 - Mobakeng Mochwaro
+//   223068452 - Nathaniël Stanley
+//   224136508 - Owami Maphalala
+//   224042164 - Philasande Simelane
 
 import 'package:flutter/material.dart';
 
@@ -11,7 +21,11 @@ class AddProductScreen extends StatefulWidget {
   final Product? product;
   final List<String> existingCodes;
 
-  const AddProductScreen({super.key, this.product, this.existingCodes = const []});
+  const AddProductScreen({
+    super.key,
+    this.product,
+    this.existingCodes = const [],
+  });
 
   @override
   State<AddProductScreen> createState() => _AddProductScreenState();
@@ -193,7 +207,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 decoration: InputDecoration(
                   labelText: 'Product Code',
                   hintText: 'e.g. PRD006',
-                  helperText: _isEditing ? 'Product code cannot be changed' : null,
+                  helperText: _isEditing
+                      ? 'Product code cannot be changed'
+                      : null,
                   border: const OutlineInputBorder(),
                 ),
                 validator: _validateCode,
