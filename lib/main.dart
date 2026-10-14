@@ -9,7 +9,7 @@
 //   224069913 - Mobakeng Mochwaro
 //   223068452 - Nathaniël Stanley
 //   224136508 - Owami Maphalala
-//   224042164 - Philasande Simelane
+//   224042163 - Philasande Simelane
 
 import 'package:flutter/material.dart';
 import 'package:retail_inventory_management_app/product_store.dart';
